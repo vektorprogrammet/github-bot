@@ -14,7 +14,9 @@ import (
 )
 
 var eventChan chan *github.PullRequestEvent
+
 const rootDir = "/var/www/github-bot"
+const botUsername = "vektorbot"
 
 type GitHubEventMonitor struct {
 	secret []byte
@@ -31,7 +33,7 @@ func (s *GitHubEventMonitor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	switch event := event.(type) {
 	case *github.PullRequestEvent:
-		if *event.Sender.Login == "vektorbot" {
+		if *event.Sender.Login == botUsername {
 			break
 		}
 
@@ -134,8 +136,7 @@ func cd(dir string) {
 
 func main() {
 	eventChan = make(chan *github.PullRequestEvent)
-
-	go func(){
+	go func() {
 		for event := range eventChan {
 			doBotStuff(event)
 		}
