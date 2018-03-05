@@ -37,9 +37,12 @@ func (s *GitHubEventMonitor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		go func(event *github.PullRequestEvent) {
-			eventChan <- event
-		}(event)
+		if *event.Action == "opened" || *event.Action == "synchronize" {
+			go func(event *github.PullRequestEvent) {
+				eventChan <- event
+			}(event)
+		}
+
 	}
 }
 
