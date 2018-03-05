@@ -118,14 +118,12 @@ func cleanUp(folderName string) {
 }
 
 func executeCommand(command string) string {
-	//fmt.Println(command)
 	cmd := exec.Command("sh", "-c", command)
 	output, err := cmd.Output()
 	if err != nil {
 		fmt.Println("Failed to execute " + command)
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-	//fmt.Printf("%s", output)
 
 	return fmt.Sprintf("%s", output)
 }
