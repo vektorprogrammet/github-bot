@@ -14,6 +14,7 @@ import (
 )
 
 var eventChan chan *github.PullRequestEvent
+const rootDir = "/var/www/github-bot"
 
 type GitHubEventMonitor struct {
 	secret []byte
@@ -57,8 +58,8 @@ func doBotStuff(event *github.PullRequestEvent) {
 
 func cloneRepo(repo string) string {
 	repoFolderName := fmt.Sprintf("%s", uuid.NewV4())
-	executeCommand(fmt.Sprintf("git clone %s /var/www/github-bot/%s", repo, repoFolderName))
-	cd(fmt.Sprintf("/var/www/github-bot/%s", repoFolderName))
+	executeCommand(fmt.Sprintf("git clone %s %s/%s", repo, rootDir, repoFolderName))
+	cd(fmt.Sprintf("%s/%s", rootDir, repoFolderName))
 
 	return repoFolderName
 }
@@ -68,7 +69,7 @@ func installDependencies() {
 }
 
 func createParametersFile(dbName string) {
-	executeCommand("cp /var/www/github-bot/parameters.yml app/config/parameters.yml")
+	executeCommand(fmt.Sprintf("cp %s/parameters.yml app/config/parameters.yml", rootDir))
 	executeCommand(fmt.Sprintf("sed -i 's/dbname/%s/g' app/config/parameters.yml", dbName))
 }
 
@@ -109,9 +110,9 @@ func gitPush() {
 func cleanUp(folderName string) {
 	executeCommand("php app/console doctrine:database:drop --force")
 	if len(folderName) > 1 {
-		executeCommand(fmt.Sprintf("rm -rf /var/www/github-bot/%s/", folderName))
+		executeCommand(fmt.Sprintf("rm -rf %s/%s/", rootDir, folderName))
 	}
-	cd("/var/www/github-bot")
+	cd(rootDir)
 }
 
 func executeCommand(command string) string {
