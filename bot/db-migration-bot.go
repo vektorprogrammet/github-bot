@@ -56,12 +56,13 @@ func (bot DbMigrationBot) HandleEvent(event interface{}) {
 		fmt.Println("Failed to create database")
 		return
 	}
-	//if err := bot.Symfony.DropDatabase(); err != nil {
-	//	fmt.Println("Failed to drop database")
-	//	return
-	//}
 	if err := gitclient.Checkout(branch, bot.Symfony.WorkingDirectory); err != nil {
 		fmt.Println("Failed checkout " + branch)
+		return
+	}
+	mergedCommitFromMaster, err := gitclient.PullFromBranch("master", bot.Symfony.WorkingDirectory)
+	if err != nil {
+		fmt.Println("Failed to pull from " + branch)
 		return
 	}
 	if err := bot.Symfony.InstallDependencies(); err != nil {
@@ -80,6 +81,28 @@ func (bot DbMigrationBot) HandleEvent(event interface{}) {
 
 	if !migrationCreated {
 		return
+	}
+
+	if mergedCommitFromMaster {
+		if err := gitclient.Add("app/DoctrineMigrations/", bot.Symfony.WorkingDirectory); err != nil {
+			fmt.Println("Failed to git add")
+			return
+		}
+
+		if err := gitclient.Stash(bot.Symfony.WorkingDirectory); err != nil {
+			fmt.Println("Failed to stash")
+			return
+		}
+
+		if err := gitclient.ResetHard(1, bot.Symfony.WorkingDirectory); err != nil {
+			fmt.Println("Failed to reset hard")
+			return
+		}
+
+		if err := gitclient.StashPop(bot.Symfony.WorkingDirectory); err != nil {
+			fmt.Println("Failed to stash pop")
+			return
+		}
 	}
 
 	if err := gitclient.Add("app/DoctrineMigrations/", bot.Symfony.WorkingDirectory); err != nil {
