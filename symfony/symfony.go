@@ -32,23 +32,23 @@ func (s Symfony) CreateParametersFile(dbName string) error {
 }
 
 func (s Symfony) CreateDatabase() error {
-	if _, err := cmd.Execute("php app/console doctrine:database:create", s.WorkingDirectory); err != nil{
+	if _, err := cmd.Execute("php bin/console doctrine:database:create", s.WorkingDirectory); err != nil{
 		return err
 	}
-	if _, err := cmd.Execute("php app/console doctrine:schema:create", s.WorkingDirectory); err != nil{
+	if _, err := cmd.Execute("php bin/console doctrine:schema:create", s.WorkingDirectory); err != nil{
 		return err
 	}
-	_, err := cmd.Execute("php app/console doctrine:migrations:version --add --all -n", s.WorkingDirectory)
+	_, err := cmd.Execute("php bin/console doctrine:migrations:version --add --all -n", s.WorkingDirectory)
 	return err
 }
 
 func (s Symfony) DropDatabase() error {
-	_, err := cmd.Execute("php app/console doctrine:database:drop --force", s.WorkingDirectory)
+	_, err := cmd.Execute("php bin/console doctrine:database:drop --force", s.WorkingDirectory)
 	return err
 }
 
 func (s Symfony) ExecuteMigrations() error {
-	_, err := cmd.Execute("php app/console doctrine:migrations:migrate -n", s.WorkingDirectory)
+	_, err := cmd.Execute("php bin/console doctrine:migrations:migrate -n", s.WorkingDirectory)
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (s Symfony) ExecuteMigrations() error {
 }
 
 func (s Symfony) CreateMigration() (bool, error) {
-	migrationResult, err := cmd.Execute("php app/console doctrine:migrations:diff", s.WorkingDirectory)
+	migrationResult, err := cmd.Execute("php bin/console doctrine:migrations:diff", s.WorkingDirectory)
 	if err != nil {
 		return false, err
 	}

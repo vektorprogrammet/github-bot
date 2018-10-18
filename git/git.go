@@ -9,7 +9,8 @@ import (
 )
 
 func CloneRepo(repo, rootDir string) (string, error) {
-	repoFolderName := fmt.Sprintf("%s", uuid.NewV4())
+	id, _ := uuid.NewV4()
+	repoFolderName := fmt.Sprintf("%s", id)
 	if _, err := cmd.Execute(fmt.Sprintf("git clone %s %s/%s", repo, rootDir, repoFolderName), rootDir); err != nil {
 		return "", err
 	}
